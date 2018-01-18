@@ -1,0 +1,11 @@
+package: github.com/vastness-io/linguist
+import:
+- package: github.com/Masterminds/vcs
+  version: ^1.12.0
+- package: github.com/gorilla/mux
+  version: ^1.6.1
+- package: github.com/jbrukh/bayesian
+  version: master
+- package: gopkg.in/yaml.v1
+- package: github.com/sirupsen/logrus
+  version: ^1.0.4
