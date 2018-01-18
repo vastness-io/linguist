@@ -37,7 +37,7 @@ func RepositoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	langs, err := detect.DetermineLanguages(repo.LocalPath(), 512)
+	langs, err := detect.DetermineLanguages(repo.LocalPath())
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

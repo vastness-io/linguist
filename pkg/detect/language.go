@@ -19,7 +19,7 @@ type Language struct {
 
 type Languages map[string]int64
 
-func DetermineLanguages(parentPath string, bufferSize int32) ([]Language, error) {
+func DetermineLanguages(parentPath string) ([]Language, error) {
 
 	languages := make(Languages)
 	var overallSize int64 = 0
@@ -60,6 +60,7 @@ func DetermineLanguages(parentPath string, bufferSize int32) ([]Language, error)
 			}
 
 		} else {
+
 			if linguist.ShouldIgnoreFilename(path) {
 				traverseDirectoryLogging(
 					path,
@@ -80,40 +81,6 @@ func DetermineLanguages(parentPath string, bufferSize int32) ([]Language, error)
 					byFileName,
 					"Detected language by filename")
 				languages[byFileName] += fileSize
-				overallSize += fileSize
-				return nil
-			}
-
-			content, err := getFileContents(bufferSize, path)
-
-			if err != nil {
-				logger.Error(err)
-				return filepath.SkipDir
-			}
-
-			if linguist.ShouldIgnoreContents(content) {
-				traverseDirectoryLogging(
-					path,
-					file,
-					true,
-					"",
-					"Should ignore contents")
-				return filepath.SkipDir
-			}
-
-			hints := linguist.LanguageHints(path)
-
-			determinedLang := linguist.LanguageByContents(content, hints)
-
-			traverseDirectoryLogging(
-				path,
-				file,
-				false,
-				"hints", hints,
-				"Detected language by file contents")
-
-			if determinedLang != "" {
-				languages[determinedLang] += fileSize
 				overallSize += fileSize
 				return nil
 			}
