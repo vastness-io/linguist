@@ -37,7 +37,21 @@ func RepositoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	langs, err := detect.DetermineLanguages(repo.LocalPath())
+	lister, err := action.NewRepoFileLister(repo)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	files, err := lister.GetFilesFromCurrent()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	langs, err := detect.DetermineLanguages(repo.LocalPath(), files)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

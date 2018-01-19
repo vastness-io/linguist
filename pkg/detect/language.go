@@ -2,10 +2,10 @@ package detect
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/vastness-io/linguist/pkg/action"
 	"github.com/vastness-io/linguist/pkg/linguist"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -17,82 +17,56 @@ type Language struct {
 	Percentage float64 `json:"percentage"`
 }
 
-type Languages map[string]int64
+type Languages map[string]int
 
-func DetermineLanguages(parentPath string) ([]Language, error) {
+func DetermineLanguages(localFolder string, names action.FileNames) ([]Language, error) {
 
 	languages := make(Languages)
-	var overallSize int64 = 0
+	overallSize := 0
 
-	filepath.Walk(parentPath, func(path string, file os.FileInfo, err error) error {
+	for _, name := range names {
 
-		fileSize := file.Size()
+		path := name.Name
+		sizeInBytes := name.Size
 
 		traverseDirectoryLogging(
 			path,
-			file,
+			name,
 			false,
 			"Working on file")
 
 		if linguist.ShouldIgnoreFilename(path) {
 			traverseDirectoryLogging(
 				path,
-				file,
+				name,
 				true,
 				"",
 				"Should ignore filename")
 
-			if file.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		if file.IsDir() {
-
-			if file.Name() == ".git" {
-				traverseDirectoryLogging(
-					path,
-					file,
-					true,
-					"Skipping .git folder")
-				return filepath.SkipDir
-			}
+			continue
 
 		} else {
-
-			if linguist.ShouldIgnoreFilename(path) {
-				traverseDirectoryLogging(
-					path,
-					file,
-					true,
-					"",
-					"Should ignore filename")
-				return nil
-			}
 
 			byFileName := linguist.LanguageByFilename(path)
 
 			if byFileName != "" {
 				traverseDirectoryLogging(
 					path,
-					file,
+					name,
 					false,
 					byFileName,
 					"Detected language by filename")
-				languages[byFileName] += fileSize
-				overallSize += fileSize
-				return nil
+				languages[byFileName] += sizeInBytes
+				overallSize += sizeInBytes
+				continue
 			}
 
-			languages["Other"] += fileSize
-			overallSize += fileSize
-
+			languages["Other"] += sizeInBytes
+			overallSize += sizeInBytes
 		}
-		return nil
-	})
+	}
 
-	return mapToLanguages(languages, overallSize), os.RemoveAll(parentPath)
+	return mapToLanguages(languages, overallSize), os.RemoveAll(localFolder)
 }
 
 func getFileContents(bufferSize int32, filePath string) ([]byte, error) {
@@ -118,7 +92,7 @@ func getFileContents(bufferSize int32, filePath string) ([]byte, error) {
 	return buf, nil
 }
 
-func traverseDirectoryLogging(path string, file os.FileInfo, skipped bool, language string, args ...interface{}) {
+func traverseDirectoryLogging(path string, file action.RepoFile, skipped bool, language string, args ...interface{}) {
 	logger.WithFields(log.Fields{
 		"path":     path,
 		"file":     file,
@@ -127,7 +101,7 @@ func traverseDirectoryLogging(path string, file os.FileInfo, skipped bool, langu
 	}).Debug(args)
 }
 
-func mapToLanguages(langMap Languages, dirSize int64) []Language {
+func mapToLanguages(langMap Languages, dirSize int) []Language {
 	languages := make([]Language, 0)
 
 	for lang, size := range langMap {

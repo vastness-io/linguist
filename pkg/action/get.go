@@ -5,6 +5,18 @@ import (
 	"io/ioutil"
 )
 
+func NewRepoFileLister(repo vcs.Repo) (RepoFileLister, error) {
+
+	vcsType := repo.Vcs()
+
+	switch vcsType {
+	case vcs.Git:
+		return NewGitFileLister(repo.(*vcs.GitRepo)), nil
+	default:
+		return nil, vcs.ErrCannotDetectVCS
+	}
+}
+
 func NewRepository(remoteURL string) (vcs.Repo, error) {
 	local, _ := ioutil.TempDir("", "linguist")
 
