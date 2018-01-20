@@ -4,24 +4,15 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/vastness-io/linguist/pkg/action"
 	"github.com/vastness-io/linguist/pkg/linguist"
-	"io"
-	"os"
 )
 
 var (
 	logger = log.WithField("pkg", "detect")
 )
 
-type Language struct {
-	Language   string  `json:"language"`
-	Percentage float64 `json:"percentage"`
-}
+func DetermineLanguages(names action.RepoFiles) []Language {
 
-type Languages map[string]int
-
-func DetermineLanguages(localFolder string, names action.FileNames) ([]Language, error) {
-
-	languages := make(Languages)
+	languages := make(LanguageWithSize)
 	overallSize := 0
 
 	for _, name := range names {
@@ -66,30 +57,7 @@ func DetermineLanguages(localFolder string, names action.FileNames) ([]Language,
 		}
 	}
 
-	return mapToLanguages(languages, overallSize), os.RemoveAll(localFolder)
-}
-
-func getFileContents(bufferSize int32, filePath string) ([]byte, error) {
-
-	buf := make([]byte, bufferSize)
-
-	f, err := os.Open(filePath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = f.Read(buf)
-
-	if err = f.Close(); err != nil {
-		return nil, err
-	}
-
-	if err != io.EOF {
-		return nil, err
-	}
-
-	return buf, nil
+	return mapToLanguages(languages, overallSize)
 }
 
 func traverseDirectoryLogging(path string, file action.RepoFile, skipped bool, language string, args ...interface{}) {
@@ -101,7 +69,7 @@ func traverseDirectoryLogging(path string, file action.RepoFile, skipped bool, l
 	}).Debug(args)
 }
 
-func mapToLanguages(langMap Languages, dirSize int) []Language {
+func mapToLanguages(langMap LanguageWithSize, dirSize int) []Language {
 	languages := make([]Language, 0)
 
 	for lang, size := range langMap {

@@ -1,12 +1,24 @@
 package action
 
+import (
+	"github.com/Masterminds/vcs"
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	log = logrus.WithFields(logrus.Fields{
+		"pkg": "action",
+	})
+)
+
 type RepoFile struct {
 	Name string
 	Size int
 }
 
-type FileNames []RepoFile
+type RepoFiles []RepoFile
 
 type RepoFileLister interface {
-	GetFilesFromCurrent() (FileNames, error)
+	VCS() vcs.Type
+	GetFilesFromCurrent() (RepoFiles, error)
 }

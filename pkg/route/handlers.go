@@ -8,6 +8,7 @@ import (
 	"github.com/vastness-io/linguist/pkg/detect"
 	"github.com/vastness-io/linguist/pkg/model"
 	"io/ioutil"
+	"os"
 )
 
 const (
@@ -26,16 +27,23 @@ func RepositoryHandler(w http.ResponseWriter, r *http.Request) {
 	var repositoryInfo model.RepositoryInfo
 
 	if err := json.Unmarshal(b, &repositoryInfo); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	repo, err := action.CloneRepository(repositoryInfo.String())
-
-	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	repo, err := action.CloneRepository(repositoryInfo.String())
+
+	if err != nil {
+
+		if repo != nil {
+			os.RemoveAll(repo.LocalPath())
+		}
+
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	defer os.RemoveAll(repo.LocalPath())
 
 	lister, err := action.NewRepoFileLister(repo)
 
@@ -51,15 +59,9 @@ func RepositoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	langs, err := detect.DetermineLanguages(repo.LocalPath(), files)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	langs := detect.DetermineLanguages(files)
 
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(langs); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

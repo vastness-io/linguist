@@ -17,7 +17,6 @@ func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetOutput(os.Stdout)
 	router.Methods(http.MethodPost).Path(route.FromVCSDetectPath).HandlerFunc(route.RepositoryHandler)
-	http.Handle("/", router)
 }
 
 func main() {

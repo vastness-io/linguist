@@ -3,7 +3,6 @@ package action
 import (
 	"errors"
 	"github.com/Masterminds/vcs"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 )
@@ -14,21 +13,20 @@ const (
 )
 
 type GitFileLister struct {
-	*logrus.Entry
 	*vcs.GitRepo
 }
 
 func NewGitFileLister(repo *vcs.GitRepo) RepoFileLister {
 	return &GitFileLister{
-		logrus.WithFields(logrus.Fields{
-			"pkg":  "action",
-			"type": repo.Vcs(),
-		}),
 		repo,
 	}
 }
 
-func (l *GitFileLister) GetFilesFromCurrent() (FileNames, error) {
+func (l *GitFileLister) VCS() vcs.Type {
+	return l.GitRepo.Vcs()
+}
+
+func (l *GitFileLister) GetFilesFromCurrent() (RepoFiles, error) {
 
 	ver, err := l.Version()
 
@@ -36,8 +34,8 @@ func (l *GitFileLister) GetFilesFromCurrent() (FileNames, error) {
 		return nil, err
 	}
 
-	l.WithField("version", ver).
-		Debug("Detected version.")
+	log.WithField("version", ver).
+		Debug("Detected version")
 
 	b, err := l.RunFromDir("git", "ls-tree", "-r", "-l", ver)
 
@@ -50,11 +48,11 @@ func (l *GitFileLister) GetFilesFromCurrent() (FileNames, error) {
 	gitLogLines := strings.Split(gitLogOutput, "\n")
 
 	if gitLogLines[0] == gitLogOutput {
-		l.WithField("output", gitLogOutput).Debug("Unexpected log output")
+		log.WithField("output", gitLogOutput).Debug("Unexpected log output")
 		return nil, errors.New("expected git ls-tree format")
 	}
 
-	fileNames := make(FileNames, len(gitLogLines))
+	fileNames := make(RepoFiles, 0)
 
 	for _, line := range gitLogLines[:len(gitLogLines)-1] {
 
@@ -73,7 +71,7 @@ func (l *GitFileLister) GetFilesFromCurrent() (FileNames, error) {
 
 		fileNames = append(fileNames, RepoFile{
 			Name: name,
-			Size: sizeInBytes,
+			Size: sanitizeFileSize(sizeInBytes),
 		})
 	}
 

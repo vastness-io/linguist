@@ -38,3 +38,13 @@ func CloneRepository(remoteURL string) (vcs.Repo, error) {
 
 	return repo, repo.Get()
 }
+
+func sanitizeFileSize(sizeInBytes int) int {
+	if sizeInBytes == 0 {
+		// Since the file is 0 bytes, we are only interested in the occurrence of the file
+		// So we set to 1
+		return 1
+	}
+
+	return sizeInBytes
+}
