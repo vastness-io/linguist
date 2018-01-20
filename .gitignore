@@ -14,3 +14,9 @@
 .glide/
 *.iml
 .idea/
+
+# Github's linguist metafiles
+classifier
+documentation.yml
+languages.yml
+vendor.yml
