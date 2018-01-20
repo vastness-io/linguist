@@ -9,3 +9,5 @@ import:
 - package: gopkg.in/yaml.v1
 - package: github.com/sirupsen/logrus
   version: ^1.0.4
+- package: github.com/urfave/cli
+  version: ^1.20.0

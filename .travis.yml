@@ -10,3 +10,4 @@ sudo: false
 
 script:
   - make test
+  - make build
