@@ -10,7 +10,7 @@ setup:
 
 test:
 	@echo "=> Running tests"
-	go test ./test/* -v
+	go test ./... -v
 
 build:
 	./hack/cross-platform-build.sh

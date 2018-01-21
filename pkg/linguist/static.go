@@ -306,6 +306,7 @@ Assembly:
   type: programming
   color: "#6E4C13"
   aliases:
+  - asm
   - nasm
   extensions:
   - ".asm"
@@ -3758,6 +3759,17 @@ RMarkdown:
   - ".rmd"
   tm_scope: source.gfm
   language_id: 313
+RPC:
+  type: programming
+  aliases:
+  - rpcgen
+  - oncrpc
+  - xdr
+  ace_mode: c_cpp
+  extensions:
+  - ".x"
+  tm_scope: source.c
+  language_id: 1031374237
 RPM Spec:
   type: data
   tm_scope: source.rpm-spec

@@ -1,55 +1,43 @@
 package detect
 
 import (
-	"github.com/vastness-io/linguist/pkg/action"
+	"github.com/vastness-io/linguist-svc"
 	"github.com/vastness-io/linguist/pkg/detect"
 	"testing"
 )
 
 var (
-	repoFiles = action.RepoFiles{
-		{
-			Name: "main.go",
-			Size: 1,
-		},
-		{
-			Name: "pom.xml",
-			Size: 1,
-		},
-		{
-			Name: "build.xml",
-			Size: 1,
-		},
+	repoFiles = detect.FileNames{
 
-		{
-			Name: "build.gradle",
-			Size: 1,
-		},
+		"main.go",
+		"pom.xml",
+		"build.xml",
+		"build.gradle",
 	}
 )
 
 func TestDetermineLanguages(t *testing.T) {
 	determineLanguagesTests := []struct {
-		repoFiles         action.RepoFiles
-		expectedLanguages []detect.Language
+		fileNames         detect.FileNames
+		expectedLanguages []*linguist.Language
 	}{
 		{
-			repoFiles: repoFiles,
-			expectedLanguages: []detect.Language{
+			fileNames: repoFiles,
+			expectedLanguages: []*linguist.Language{
 				{
-					Language:   "Go",
+					Name:       "Go",
 					Percentage: float64(25),
 				},
 				{
-					Language:   "Maven POM",
+					Name:       "Maven POM",
 					Percentage: float64(25),
 				},
 				{
-					Language:   "Gradle",
+					Name:       "Gradle",
 					Percentage: float64(25),
 				},
 				{
-					Language:   "Ant Build System",
+					Name:       "Ant Build System",
 					Percentage: float64(25),
 				},
 			},
@@ -58,12 +46,12 @@ func TestDetermineLanguages(t *testing.T) {
 
 	for _, test := range determineLanguagesTests {
 
-		langs := detect.DetermineLanguages(test.repoFiles)
+		langs := detect.DetermineLanguages(test.fileNames)
 
 		for _, iLang := range test.expectedLanguages {
 
 			for _, jLang := range langs {
-				if jLang.Language != iLang.Language {
+				if jLang.Name != iLang.Name {
 					continue
 				}
 				if jLang.Percentage != iLang.Percentage {

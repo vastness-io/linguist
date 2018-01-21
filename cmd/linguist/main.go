@@ -1,18 +1,17 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"github.com/vastness-io/linguist/pkg/route"
-	"net/http"
+	"github.com/vastness-io/linguist-svc"
+	"github.com/vastness-io/linguist/pkg/svc"
+	"google.golang.org/grpc"
+	"net"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-	"time"
 )
 
 const (
@@ -21,7 +20,6 @@ const (
 )
 
 var (
-	router    = mux.NewRouter()
 	log       = logrus.WithField("pkg", "main")
 	commit    string
 	version   string
@@ -33,7 +31,6 @@ var (
 func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetOutput(os.Stdout)
-	router.Methods(http.MethodPost).Path(route.FromVCSDetectPath).HandlerFunc(route.RepositoryHandler)
 }
 
 func main() {
@@ -51,7 +48,7 @@ func main() {
 		cli.IntFlag{
 			Name:        "port,p",
 			Usage:       "Port to listen on",
-			Value:       8080,
+			Value:       8082,
 			Destination: &port,
 		},
 		cli.BoolFlag{
@@ -72,17 +69,24 @@ func run() {
 
 	log.Info("Starting linguist")
 
-	srv := http.Server{
-		Addr:    fmt.Sprintf("%s:%s", addr, strconv.Itoa(port)),
-		Handler: router,
+	address := fmt.Sprintf("%s:%s", addr, strconv.Itoa(port))
+
+	lis, err := net.Listen("tcp", address)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	s := grpc.NewServer()
+
 	go func() {
-		log.Infof("Listening on %s", srv.Addr)
-		if err := srv.ListenAndServe(); err != nil {
+		log.Infof("Listening on %s", address)
+		if err := s.Serve(lis); err != nil {
 			log.Fatal(err)
 		}
 	}()
+
+	linguist.RegisterLinguistServer(s, &svc.LinguistService{})
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
@@ -91,10 +95,7 @@ func run() {
 		select {
 		case <-signalChan:
 			log.Info("Exiting linguist")
-			ctx, _ := context.WithTimeout(context.Background(), time.Minute)
-			if err := srv.Shutdown(ctx); err != nil {
-				os.Exit(1)
-			}
+			s.GracefulStop()
 			os.Exit(0)
 		}
 	}
