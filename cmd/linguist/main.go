@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/vastness-io/linguist-svc"
-	"github.com/vastness-io/linguist/pkg/svc"
-	"google.golang.org/grpc"
+	toolkit "github.com/vastness-io/toolkit/pkg/grpc"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+	"github.com/vastness-io/linguist/pkg/service"
+	"github.com/vastness-io/linguist/pkg/server"
 )
 
 const (
@@ -20,7 +22,7 @@ const (
 )
 
 var (
-	log       = logrus.WithField("pkg", "main")
+	log       = logrus.WithField("component", "linguist")
 	commit    string
 	version   string
 	addr      string
@@ -30,7 +32,6 @@ var (
 
 func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetOutput(os.Stdout)
 }
 
 func main() {
@@ -69,24 +70,27 @@ func run() {
 
 	log.Info("Starting linguist")
 
-	address := fmt.Sprintf("%s:%s", addr, strconv.Itoa(port))
+	var (
+		address  = net.JoinHostPort(addr, strconv.Itoa(port))
+		tracer   = opentracing.GlobalTracer()
+		lis, err = net.Listen("tcp", address)
+		srv      = toolkit.NewGRPCServer(tracer, log)
+		svc = service.NewLinguistService()
 
-	lis, err := net.Listen("tcp", address)
+	)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s := grpc.NewServer()
-
 	go func() {
 		log.Infof("Listening on %s", address)
-		if err := s.Serve(lis); err != nil {
+		if err := srv.Serve(lis); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
-	linguist.RegisterLinguistServer(s, &svc.LinguistService{})
+	linguist.RegisterLinguistServer(srv, server.NewLinguistServer(svc))
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
@@ -95,7 +99,7 @@ func run() {
 		select {
 		case <-signalChan:
 			log.Info("Exiting linguist")
-			s.GracefulStop()
+			srv.GracefulStop()
 			os.Exit(0)
 		}
 	}
