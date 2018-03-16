@@ -1,5 +1,5 @@
-hash: 5a4424419cbc71a9e54981774ecc977ec3bb6175e96d28bffd4ae9ca29eb1cb1
-updated: 2018-02-19T10:29:52.584270094+01:00
+hash: 0563fefb2c22e0441ba2df3ae26531e6d99acccdafe14d9e70bd5503004bb6a2
+updated: 2018-03-14T16:34:35.649005+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -18,10 +18,11 @@ imports:
 - name: github.com/gorilla/mux
   version: 53c1911da2b537f792e7cafcb446b05ffe33b996
 - name: github.com/grpc-ecosystem/go-grpc-middleware
-  version: d0c54e68681ec7999ac17864470f3bee6521ba2b
+  version: eb23b08d08bbe930113a6512a7a829050341448c
   subpackages:
   - logging
   - logging/logrus
+  - logging/logrus/ctxlogrus
   - tags
   - tags/logrus
   - tracing/opentracing
@@ -40,7 +41,7 @@ imports:
   - ext
   - log
 - name: github.com/prometheus/client_golang
-  version: e69720d204a4aa3b0c65dc91208645ba0a52b9cd
+  version: c3324c1198cf3374996e9d3098edd46a6b55afc9
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
@@ -48,33 +49,33 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 89604d197083d4781071d3c65855d24ecfb0a563
+  version: e4aa40a9169a88835b849a6efb71e05dc04b88f0
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 282c8707aa210456a825798969cc27edda34992a
+  version: 54d17b57dd7d4a3aa092476596b3f8a933bde349
   subpackages:
   - internal/util
   - nfs
   - xfs
 - name: github.com/sirupsen/logrus
-  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
+  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: github.com/vastness-io/linguist-svc
   version: 24e7369ec1a84ba35f420e00f7d2f734dee66c35
 - name: github.com/vastness-io/toolkit
-  version: 4c1f9dfd61bc6b2fac33c1940eef1b159c24ae41
+  version: a25d6ce09da43b9852062215b7cabbfeb35169bb
   subpackages:
   - pkg/grpc
 - name: golang.org/x/crypto
-  version: 650f4a345ab4e5b245a3034b110ebc7299e68186
+  version: c4a91bd4f524f10d064139674cf55852e055ad01
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb
+  version: 892bf7b0c6e2f93b51166bf3882e50277fa5afc6
   subpackages:
   - context
   - http2
@@ -84,19 +85,19 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/sys
-  version: 37707fdb30a5b38865cfb95e5aab41707daec7fd
+  version: 932fb2287bee613f2a65e71685c9d9c0020da979
   subpackages:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1
+  version: 6ddec15f6ad41e5f923285a7f51fb026349034d9
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: 2b5a72b8730b0b16380010cfe5286c42108d88e7
+  version: df60624c1e9b9d2973e889c7a1cff73155da81c4
   subpackages:
   - googleapis/rpc/status
 - name: google.golang.org/grpc

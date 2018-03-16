@@ -77,12 +77,96 @@ Note - due to implementation ZAP differs from Logrus in the "grpc.request.conten
 
 Please see examples and tests for examples of use.
 
+#### Example:
+
+<details>
+<summary>Click to expand code.</summary>
+
+```go
+// Shared options for the logger, with a custom gRPC code to log level function.
+opts := []grpc_zap.Option{
+    grpc_zap.WithLevels(customFunc),
+}
+// Make sure that log statements internal to gRPC library are logged using the zapLogger as well.
+grpc_zap.ReplaceGrpcLogger(zapLogger)
+// Create a server, make sure we put the grpc_ctxtags context before everything else.
+_ = grpc.NewServer(
+    grpc_middleware.WithUnaryServerChain(
+        grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+        grpc_zap.UnaryServerInterceptor(zapLogger, opts...),
+    ),
+    grpc_middleware.WithStreamServerChain(
+        grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+        grpc_zap.StreamServerInterceptor(zapLogger, opts...),
+    ),
+)
+```
+
+</details>
+
+#### Example:
+
+<details>
+<summary>Click to expand code.</summary>
+
+```go
+opts := []grpc_zap.Option{
+    grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+        // will not log gRPC calls if it was a call to healthcheck and no error was raised
+        if err == nil && fullMethodName == "foo.bar.healthcheck" {
+            return false
+        }
+
+        // by default everything will be logged
+        return true
+    }),
+}
+
+_ = []grpc.ServerOption{
+    grpc_middleware.WithStreamServerChain(
+        grpc_ctxtags.StreamServerInterceptor(),
+        grpc_zap.StreamServerInterceptor(zap.NewNop(), opts...)),
+    grpc_middleware.WithUnaryServerChain(
+        grpc_ctxtags.UnaryServerInterceptor(),
+        grpc_zap.UnaryServerInterceptor(zap.NewNop(), opts...)),
+}
+```
+
+</details>
+
+#### Example:
+
+<details>
+<summary>Click to expand code.</summary>
+
+```go
+opts := []grpc_zap.Option{
+    grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
+        return zap.Int64("grpc.time_ns", duration.Nanoseconds())
+    }),
+}
+
+_ = grpc.NewServer(
+    grpc_middleware.WithUnaryServerChain(
+        grpc_ctxtags.UnaryServerInterceptor(),
+        grpc_zap.UnaryServerInterceptor(zapLogger, opts...),
+    ),
+    grpc_middleware.WithStreamServerChain(
+        grpc_ctxtags.StreamServerInterceptor(),
+        grpc_zap.StreamServerInterceptor(zapLogger, opts...),
+    ),
+)
+```
+
+</details>
+
 ## <a name="pkg-imports">Imported Packages</a>
 
 - [github.com/golang/protobuf/jsonpb](https://godoc.org/github.com/golang/protobuf/jsonpb)
 - [github.com/golang/protobuf/proto](https://godoc.org/github.com/golang/protobuf/proto)
 - [github.com/grpc-ecosystem/go-grpc-middleware](./../..)
 - [github.com/grpc-ecosystem/go-grpc-middleware/logging](./..)
+- [github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap](./ctxzap)
 - [github.com/grpc-ecosystem/go-grpc-middleware/tags/zap](./../../tags/zap)
 - [go.uber.org/zap](https://godoc.org/go.uber.org/zap)
 - [go.uber.org/zap/zapcore](https://godoc.org/go.uber.org/zap/zapcore)
@@ -117,7 +201,10 @@ Please see examples and tests for examples of use.
   * [func WithLevels(f CodeToLevel) Option](#WithLevels)
 
 #### <a name="pkg-examples">Examples</a>
-* [WithDecider](#example_WithDecider)
+* [Extract (Unary)](#example_Extract_unary)
+* [Package (Initialization)](#example__initialization)
+* [Package (InitializationWithDecider)](#example__initializationWithDecider)
+* [Package (InitializationWithDurationFieldOverride)](#example__initializationWithDurationFieldOverride)
 
 #### <a name="pkg-files">Package files</a>
 [client_interceptors.go](./client_interceptors.go) [context.go](./context.go) [doc.go](./doc.go) [grpclogger.go](./grpclogger.go) [options.go](./options.go) [payload_interceptors.go](./payload_interceptors.go) [server_interceptors.go](./server_interceptors.go) 
@@ -155,7 +242,7 @@ var (
 func AddFields(ctx context.Context, fields ...zapcore.Field)
 ```
 AddFields adds zap fields to the logger.
-Deprecated: should use the ctx_zap.AddFields instead
+Deprecated: should use the ctxzap.AddFields instead
 
 ## <a name="DefaultClientCodeToLevel">func</a> [DefaultClientCodeToLevel](./options.go#L127)
 ``` go
@@ -187,7 +274,27 @@ DurationToTimeMillisField converts the duration to milliseconds and uses the key
 func Extract(ctx context.Context) *zap.Logger
 ```
 Extract takes the call-scoped Logger from grpc_zap middleware.
-Deprecated: should use the ctx_zap.Extract instead
+Deprecated: should use the ctxzap.Extract instead
+
+#### Example:
+
+<details>
+<summary>Click to expand code.</summary>
+
+```go
+_ = func(ctx context.Context, ping *pb_testproto.PingRequest) (*pb_testproto.PingResponse, error) {
+    // Add fields the ctxtags of the request which will be added to all extracted loggers.
+    grpc_ctxtags.Extract(ctx).Set("custom_tags.string", "something").Set("custom_tags.int", 1337)
+
+    // Extract a single request-scoped zap.Logger and log messages. (containing the grpc.xxx tags)
+    l := ctx_zap.Extract(ctx)
+    l.Info("some ping")
+    l.Info("another ping")
+    return &pb_testproto.PingResponse{Value: ping.Value}, nil
+}
+```
+
+</details>
 
 ## <a name="PayloadStreamClientInterceptor">func</a> [PayloadStreamClientInterceptor](./payload_interceptors.go#L74)
 ``` go
@@ -232,7 +339,7 @@ func StreamClientInterceptor(logger *zap.Logger, opts ...Option) grpc.StreamClie
 ```
 StreamServerInterceptor returns a new streaming client interceptor that optionally logs the execution of external gRPC calls.
 
-## <a name="StreamServerInterceptor">func</a> [StreamServerInterceptor](./server_interceptors.go#L50)
+## <a name="StreamServerInterceptor">func</a> [StreamServerInterceptor](./server_interceptors.go#L51)
 ``` go
 func StreamServerInterceptor(logger *zap.Logger, opts ...Option) grpc.StreamServerInterceptor
 ```
@@ -244,7 +351,7 @@ func UnaryClientInterceptor(logger *zap.Logger, opts ...Option) grpc.UnaryClient
 ```
 UnaryClientInterceptor returns a new unary client interceptor that optionally logs the execution of external gRPC calls.
 
-## <a name="UnaryServerInterceptor">func</a> [UnaryServerInterceptor](./server_interceptors.go#L24)
+## <a name="UnaryServerInterceptor">func</a> [UnaryServerInterceptor](./server_interceptors.go#L25)
 ``` go
 func UnaryServerInterceptor(logger *zap.Logger, opts ...Option) grpc.UnaryServerInterceptor
 ```
@@ -279,35 +386,6 @@ func WithDecider(f grpc_logging.Decider) Option
 ```
 WithDecider customizes the function for deciding if the gRPC interceptor logs should log.
 
-#### Example:
-
-<details>
-<summary>Click to expand code.</summary>
-
-```go
-opts := []grpc_zap.Option{
-    grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-        // will not log gRPC calls if it was a call to healthcheck and no error was raised
-        if err == nil && fullMethodName == "foo.bar.healthcheck" {
-            return false
-        }
-
-        // by default everything will be logged
-        return true
-    }),
-}
-
-_ = []grpc.ServerOption{
-    grpc_middleware.WithStreamServerChain(
-        grpc_ctxtags.StreamServerInterceptor(),
-        grpc_zap.StreamServerInterceptor(zap.NewNop(), opts...)),
-    grpc_middleware.WithUnaryServerChain(
-        grpc_ctxtags.UnaryServerInterceptor(),
-        grpc_zap.UnaryServerInterceptor(zap.NewNop(), opts...)),
-}
-```
-
-</details>
 ### <a name="WithDurationField">func</a> [WithDurationField](./options.go#L78)
 ``` go
 func WithDurationField(f DurationToField) Option

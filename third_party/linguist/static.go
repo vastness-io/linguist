@@ -31,7 +31,7 @@ var files = map[string]string{
 #                     in the statistics as the parent language.
 #
 # Any additions or modifications (even trivial) should have corresponding
-# test changes in ` + "`" + `test/test_blob.rb` + "`" + `.
+# test changes in `+"`"+`test/test_blob.rb`+"`"+`.
 #
 # Please keep this list alphabetized. Capitalization comes before lowercase.
 
@@ -735,6 +735,17 @@ Closure Templates:
   - ".soy"
   tm_scope: text.html.soy
   language_id: 357046146
+CoNLL-U:
+  type: data
+  extensions:
+  - ".conllu"
+  - ".conll"
+  tm_scope: text.conllu
+  ace_mode: text
+  aliases:
+  - CoNLL
+  - CoNLL-X
+  language_id: 421026389
 CoffeeScript:
   type: programming
   tm_scope: source.coffee
@@ -1739,6 +1750,7 @@ HTML+Django:
   group: HTML
   extensions:
   - ".jinja"
+  - ".jinja2"
   - ".mustache"
   - ".njk"
   aliases:
@@ -2030,12 +2042,23 @@ JSON:
   searchable: false
   extensions:
   - ".json"
+  - ".avsc"
   - ".geojson"
+  - ".gltf"
   - ".JSON-tmLanguage"
+  - ".jsonl"
+  - ".tfstate"
+  - ".tfstate.backup"
   - ".topojson"
+  - ".webapp"
+  - ".webmanifest"
   filenames:
   - ".arcconfig"
+  - ".htmlhintrc"
+  - ".jscsrc"
   - ".jshintrc"
+  - ".tern-config"
+  - ".tern-project"
   - composer.lock
   - mcmod.info
   language_id: 174
@@ -2045,6 +2068,7 @@ JSON5:
   - ".json5"
   filenames:
   - ".babelrc"
+  - ".jslintrc"
   tm_scope: source.js
   ace_mode: javascript
   codemirror_mode: javascript
@@ -2370,6 +2394,7 @@ Linker Script:
   extensions:
   - ".ld"
   - ".lds"
+  - ".x"
   filenames:
   - ld.script
   tm_scope: none
@@ -2911,7 +2936,7 @@ Nextflow:
   extensions:
   - ".nf"
   filenames:
-  - "nextflow.config"  
+  - nextflow.config
   interpreters:
   - nextflow
   language_id: 506780613
@@ -4194,7 +4219,7 @@ Scala:
   color: "#c22d40"
   extensions:
   - ".scala"
-  - ".kojo"  
+  - ".kojo"
   - ".sbt"
   - ".sc"
   interpreters:
@@ -5327,7 +5352,7 @@ xBase:
 # pathname.
 #
 # Please add additional test coverage to
-# ` + "`" + `test/test_blob.rb#test_vendored` + "`" + ` if you make any changes.
+# `+"`"+`test/test_blob.rb#test_vendored`+"`"+` if you make any changes.
 
 ## Vendor Conventions ##
 
@@ -5685,7 +5710,7 @@ xBase:
 # pathname.
 #
 # Please add additional test coverage to
-# ` + "`" + `test/test_blob.rb#test_documentation` + "`" + ` if you make any changes.
+# `+"`"+`test/test_blob.rb#test_documentation`+"`"+` if you make any changes.
 
 ## Documentation directories ##
 
@@ -5710,4 +5735,5 @@ xBase:
 # Samples folders
 - ^[Ss]amples?/
 `,
+
 }

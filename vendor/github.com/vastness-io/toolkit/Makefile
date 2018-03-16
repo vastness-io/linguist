@@ -7,7 +7,7 @@ export VERSION COMMIT LATEST_TAG
 
 test:
 	@echo "=> Running tests"
-	go test ./... --cover
+	./hack/run-tests.sh
 
 verify:
 	./hack/verify-version.sh

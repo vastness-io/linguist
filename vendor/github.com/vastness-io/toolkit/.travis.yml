@@ -7,3 +7,6 @@ sudo: false
 
 script:
   - make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
