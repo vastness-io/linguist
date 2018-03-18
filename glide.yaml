@@ -1,0 +1,18 @@
+package: github.com/vastness-io/linguist
+import:
+- package: github.com/gorilla/mux
+  version: ^1.6.1
+- package: github.com/jbrukh/bayesian
+  version: master
+- package: gopkg.in/yaml.v1
+- package: github.com/sirupsen/logrus
+  version: ^1.0.4
+- package: github.com/urfave/cli
+  version: ^1.20.0
+- package: google.golang.org/grpc
+  version: ^1.9.2
+- package: github.com/vastness-io/linguist-svc
+  version: ^0.1.0
+- package: github.com/opentracing/opentracing-go
+  version: ^1.0.2
+- package: github.com/vastness-io/toolkit

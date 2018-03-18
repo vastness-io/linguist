@@ -10,5 +10,18 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Codecov
+coverage.txt
+
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+*.iml
+.idea/
+
+bin/
+
+# Github's linguist metafiles
+classifier
+documentation.yml
+languages.yml
+vendor.yml

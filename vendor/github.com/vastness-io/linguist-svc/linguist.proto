@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package linguist;
+
+service Linguist {
+    rpc GetLanguages (LanguageRequest) returns (LanguageResponse) {}
+}
+
+message LanguageRequest {
+    repeated string file_names = 1;
+}
+
+message LanguageResponse {
+    repeated Language language = 1;
+}
+
+message Language {
+    string name = 1;
+    double percentage = 2;
+}
