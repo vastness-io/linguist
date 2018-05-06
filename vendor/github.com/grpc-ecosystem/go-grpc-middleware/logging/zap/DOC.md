@@ -19,7 +19,7 @@ If a deadline is present on the gRPC request the grpc.request.deadline tag is po
 is a string representing the time (RFC3339) when the current call will expire.
 
 This package also implements request and response *payload* logging, both for server-side and client-side. These will be
-logged as structured `jsonbp` fields for every message received/sent (both unary and streaming). For that please use
+logged as structured `jsonpb` fields for every message received/sent (both unary and streaming). For that please use
 `Payload*Interceptor` functions for that. Please note that the user-provided function that determines whetether to log
 the full request/response payload needs to be written with care, this can significantly slow down gRPC.
 
@@ -28,30 +28,30 @@ ZAP can also be made as a backend for gRPC library internals. For that use `Repl
 *Server Interceptor*
 Below is a JSON formatted example of a log that would be logged by the server interceptor:
 
-		{
-		  "level": "info",									// string  zap log levels
-		  "msg": "finished unary call",						// string  log message
+	{
+	  "level": "info",									// string  zap log levels
+	  "msg": "finished unary call",						// string  log message
 	
-		  "grpc.code": "OK",								// string  grpc status code
-		  "grpc.method": "Ping",							// string  method name
-		  "grpc.service": "mwitkow.testproto.TestService",  // string  full name of the called service
-		  "grpc.start_time": "2006-01-02T15:04:05Z07:00",   // string  RFC3339 representation of the start time
-	      "grpc.request.deadline"							// string  RFC3339 deadline of the current request if supplied
-		  "grpc.request.value": "something",				// string  value on the request
-		  "grpc.time_ms": 1.345,							// float32 run time of the call in ms
+	  "grpc.code": "OK",								// string  grpc status code
+	  "grpc.method": "Ping",							// string  method name
+	  "grpc.service": "mwitkow.testproto.TestService",  // string  full name of the called service
+	  "grpc.start_time": "2006-01-02T15:04:05Z07:00",   // string  RFC3339 representation of the start time
+	  "grpc.request.deadline": "2006-01-02T15:04:05Z07:00",   // string  RFC3339 deadline of the current request if supplied
+	  "grpc.request.value": "something",				// string  value on the request
+	  "grpc.time_ms": 1.345,							// float32 run time of the call in ms
 	
-		  "peer.address": {
-		    "IP": "127.0.0.1",								// string  IP address of calling party
-		    "Port": 60216,									// int     port call is coming in on
-		    "Zone": ""										// string  peer zone for caller
-		  },
-		  "span.kind": "server",							// string  client | server
-		  "system": "grpc"									// string
+	  "peer.address": {
+	    "IP": "127.0.0.1",								// string  IP address of calling party
+	    "Port": 60216,									// int     port call is coming in on
+	    "Zone": ""										// string  peer zone for caller
+	  },
+	  "span.kind": "server",							// string  client | server
+	  "system": "grpc"									// string
 	
-		  "custom_field": "custom_value",					// string  user defined field
-		  "custom_tags.int": 1337,							// int     user defined tag on the ctx
-		  "custom_tags.string": "something",				// string  user defined tag on the ctx
-		}
+	  "custom_field": "custom_value",					// string  user defined field
+	  "custom_tags.int": 1337,							// int     user defined tag on the ctx
+	  "custom_tags.string": "something",				// string  user defined tag on the ctx
+	}
 
 *Payload Interceptor*
 Below is a JSON formatted example of a log that would be logged by the payload interceptor:
@@ -215,7 +215,7 @@ var (
     // SystemField is used in every log statement made through grpc_zap. Can be overwritten before any initialization code.
     SystemField = zap.String("system", "grpc")
 
-    // ServerField is used in every server-side log statment made through grpc_zap.Can be overwritten before initialization.
+    // ServerField is used in every server-side log statement made through grpc_zap.Can be overwritten before initialization.
     ServerField = zap.String("span.kind", "server")
 )
 ```
@@ -232,7 +232,7 @@ DefaultDurationToField is the default implementation of converting request durat
 
 ``` go
 var (
-    // JsonPBMarshaller is the marshaller used for serializing protobuf messages.
+    // JsonPbMarshaller is the marshaller used for serializing protobuf messages.
     JsonPbMarshaller = &jsonpb.Marshaler{}
 )
 ```
@@ -300,13 +300,13 @@ _ = func(ctx context.Context, ping *pb_testproto.PingRequest) (*pb_testproto.Pin
 ``` go
 func PayloadStreamClientInterceptor(logger *zap.Logger, decider grpc_logging.ClientPayloadLoggingDecider) grpc.StreamClientInterceptor
 ```
-PayloadStreamServerInterceptor returns a new streaming client interceptor that logs the paylods of requests and responses.
+PayloadStreamClientInterceptor returns a new streaming client interceptor that logs the paylods of requests and responses.
 
 ## <a name="PayloadStreamServerInterceptor">func</a> [PayloadStreamServerInterceptor](./payload_interceptors.go#L46)
 ``` go
 func PayloadStreamServerInterceptor(logger *zap.Logger, decider grpc_logging.ServerPayloadLoggingDecider) grpc.StreamServerInterceptor
 ```
-PayloadUnaryServerInterceptor returns a new server server interceptors that logs the payloads of requests.
+PayloadStreamServerInterceptor returns a new server server interceptors that logs the payloads of requests.
 
 This *only* works when placed *after* the `grpc_zap.StreamServerInterceptor`. However, the logging can be done to a
 separate instance of the logger.
@@ -337,7 +337,7 @@ This should be called *before* any other initialization, preferably from init() 
 ``` go
 func StreamClientInterceptor(logger *zap.Logger, opts ...Option) grpc.StreamClientInterceptor
 ```
-StreamServerInterceptor returns a new streaming client interceptor that optionally logs the execution of external gRPC calls.
+StreamClientInterceptor returns a new streaming client interceptor that optionally logs the execution of external gRPC calls.
 
 ## <a name="StreamServerInterceptor">func</a> [StreamServerInterceptor](./server_interceptors.go#L51)
 ``` go

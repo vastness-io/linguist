@@ -17,4 +17,5 @@ message LanguageResponse {
 message Language {
     string name = 1;
     double percentage = 2;
+    repeated string file_names = 3;
 }

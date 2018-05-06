@@ -1,12 +1,12 @@
-hash: 0563fefb2c22e0441ba2df3ae26531e6d99acccdafe14d9e70bd5503004bb6a2
-updated: 2018-03-14T16:34:35.649005+01:00
+hash: 858d640d537ae65c2036466d75beef099762bc6378648d012c539853f17bae54
+updated: 2018-05-06T18:06:56.338074+02:00
 imports:
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: 3a771d992973f24aa725d07868b467d1ddfceafb
   subpackages:
   - quantile
 - name: github.com/golang/protobuf
-  version: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
+  version: b4deda0973fb4c70b50d226b1af49f3da59f5265
   subpackages:
   - jsonpb
   - proto
@@ -18,7 +18,7 @@ imports:
 - name: github.com/gorilla/mux
   version: 53c1911da2b537f792e7cafcb446b05ffe33b996
 - name: github.com/grpc-ecosystem/go-grpc-middleware
-  version: eb23b08d08bbe930113a6512a7a829050341448c
+  version: c250d6563d4d4c20252cd865923440e829844f4e
   subpackages:
   - logging
   - logging/logrus
@@ -41,7 +41,7 @@ imports:
   - ext
   - log
 - name: github.com/prometheus/client_golang
-  version: c3324c1198cf3374996e9d3098edd46a6b55afc9
+  version: 82f5ff156b29e276022b1a958f7d385870fb9814
   subpackages:
   - prometheus
 - name: github.com/prometheus/client_model
@@ -49,35 +49,36 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: e4aa40a9169a88835b849a6efb71e05dc04b88f0
+  version: d811d2e9bf898806ecfb6ef6296774b13ffc314c
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 54d17b57dd7d4a3aa092476596b3f8a933bde349
+  version: 8b1c2da0d56deffdbb9e48d4414b4e674bd8083e
   subpackages:
   - internal/util
   - nfs
   - xfs
 - name: github.com/sirupsen/logrus
-  version: c155da19408a8799da419ed3eeb0cb5db0ad5dbc
+  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: github.com/vastness-io/linguist-svc
-  version: 24e7369ec1a84ba35f420e00f7d2f734dee66c35
+  version: 524f22a7314626e515e980753102e0724a90f0ed
 - name: github.com/vastness-io/toolkit
-  version: a25d6ce09da43b9852062215b7cabbfeb35169bb
+  version: ddfe7c027727cb412b3d4e7a1392bd820737bce5
   subpackages:
   - pkg/grpc
 - name: golang.org/x/crypto
-  version: c4a91bd4f524f10d064139674cf55852e055ad01
+  version: 4ec37c66abab2c7e02ae775328b2ff001c3f025a
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: 892bf7b0c6e2f93b51166bf3882e50277fa5afc6
+  version: 640f4622ab692b87c2f3a94265e6f579fe38263d
   subpackages:
   - context
+  - http/httpguts
   - http2
   - http2/hpack
   - idna
@@ -85,23 +86,23 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/sys
-  version: 932fb2287bee613f2a65e71685c9d9c0020da979
+  version: 6f686a352de66814cdd080d970febae7767857a3
   subpackages:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 6ddec15f6ad41e5f923285a7f51fb026349034d9
+  version: 7922cc490dd5a7dbaa7fd5d6196b49db59ac042f
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: df60624c1e9b9d2973e889c7a1cff73155da81c4
+  version: 86e600f69ee4704c6efbf6a2a40a5c10700e76c2
   subpackages:
   - googleapis/rpc/status
 - name: google.golang.org/grpc
-  version: 8e4536a86ab602859c20df5ebfd0bd4228d08655
+  version: 6b51017f791ae1cfbec89c52efdf444b13b550ef
   subpackages:
   - balancer
   - balancer/base
@@ -110,7 +111,6 @@ imports:
   - connectivity
   - credentials
   - encoding
-  - encoding/proto
   - grpclb/grpc_lb_v1/messages
   - grpclog
   - internal
