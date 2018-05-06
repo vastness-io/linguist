@@ -35,11 +35,20 @@ func NewGRPCClient(tracer opentracing.Tracer, logger *logrus.Entry, opts ...grpc
 }
 
 func defaultClientInterceptors(tracer opentracing.Tracer, logger *logrus.Entry) grpc.UnaryClientInterceptor {
+	if logger != nil {
+		return grpc_middleware.ChainUnaryClient(
+			grpc_opentracing.UnaryClientInterceptor(
+				grpc_opentracing.WithTracer(tracer),
+			),
+			grpc_logrus.UnaryClientInterceptor(logger),
+			grpc_prometheus.UnaryClientInterceptor,
+		)
+	}
+
 	return grpc_middleware.ChainUnaryClient(
 		grpc_opentracing.UnaryClientInterceptor(
 			grpc_opentracing.WithTracer(tracer),
 		),
-		grpc_logrus.UnaryClientInterceptor(logger),
 		grpc_prometheus.UnaryClientInterceptor,
 	)
 }

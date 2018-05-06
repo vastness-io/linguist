@@ -5,7 +5,7 @@ import (
 	"github.com/vastness-io/linguist/pkg/language"
 )
 
-type linguistService struct {}
+type linguistService struct{}
 
 func NewLinguistService() LinguistService {
 	return &linguistService{}

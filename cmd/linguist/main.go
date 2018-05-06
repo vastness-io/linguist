@@ -6,14 +6,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/vastness-io/linguist-svc"
+	"github.com/vastness-io/linguist/pkg/server"
+	"github.com/vastness-io/linguist/pkg/service"
 	toolkit "github.com/vastness-io/toolkit/pkg/grpc"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-	"github.com/vastness-io/linguist/pkg/service"
-	"github.com/vastness-io/linguist/pkg/server"
 )
 
 const (
@@ -75,8 +75,7 @@ func run() {
 		tracer   = opentracing.GlobalTracer()
 		lis, err = net.Listen("tcp", address)
 		srv      = toolkit.NewGRPCServer(tracer, log)
-		svc = service.NewLinguistService()
-
+		svc      = service.NewLinguistService()
 	)
 
 	if err != nil {

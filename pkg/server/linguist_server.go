@@ -6,7 +6,7 @@ import (
 	"github.com/vastness-io/linguist/pkg/service"
 )
 
-type LinguistServer struct{
+type LinguistServer struct {
 	LinguistService service.LinguistService
 }
 
