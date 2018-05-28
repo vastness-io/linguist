@@ -17,3 +17,13 @@ build:
 
 verify:
 	./hack/verify-version.sh
+
+container: build
+	docker build -t quay.io/vastness/linguist:${COMMIT} .
+
+push: container
+	docker push quay.io/vastness/linguist:${COMMIT}
+	docker tag quay.io/vastness/linguist:${COMMIT} quay.io/vastness/linguist:${VERSION}
+	docker push quay.io/vastness/linguist:${VERSION}
+	docker tag quay.io/vastness/linguist:${COMMIT} quay.io/vastness/linguist:latest
+	docker push quay.io/vastness/linguist:latest
